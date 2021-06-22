@@ -1,0 +1,7 @@
+org/zerock/domain/BoardVO.class
+org/zerock/domain/PageDTO.class
+org/zerock/controller/BoardController.class
+org/zerock/service/BoardService.class
+org/zerock/mapper/BoardMapper.class
+org/zerock/service/BoardServiceImpl.class
+org/zerock/domain/Criteria.class

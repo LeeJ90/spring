@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+                           http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="customAccessDenied" class="org.zerock.security.CustomAccessDeniedHandler"></bean>
+    <bean id="customLoginSuccess" class="org.zerock.security.CustomLoginSuccessHandler"></bean>
+
+
+<!--    <bean id="customPasswordEncoder" class="org.zerock.security.CustomNoOpPasswordEncoder"></bean>-->
+    <bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+    <bean id="customUserDetailsService" class="org.zerock.security.CustomUserDetailService"></bean>
+
+
+    <!-- use-expressions - SQL 문법을 사용   -->
+    <!-- auto-config='true' 를 설정한것만으로 기본 로그인페이지/ HTTP 기본인증 / 로그아웃기능등을 제공한다. -->
+    <security:http auto-config="true" use-expressions="true">
+
+        <security:intercept-url pattern="/sample/all" access="permitAll"/>
+        <security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MEMBER')"/>
+        <security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/>
+
+
+
+
+<!--        <security:access-denied-handler error-page="/accessError" />-->
+        <security:access-denied-handler ref="customAccessDenied" />
+
+
+        <!--        <security:form-login />-->
+        <security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/>
+
+        <!--   invalidate-session 세션 무효화     -->
+        <security:logout logout-url="/customLogout" invalidate-session="true" delete-cookies="remember-me, JSESSION_ID" />
+
+        <security:remember-me data-source-ref="dataSource" token-validity-seconds="604800"/>
+
+<!--        <security:csrf disabled="true"/>-->
+
+
+
+    </security:http>
+
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="customUserDetailsService">
+
+
+
+<!--            <security:jdbc-user-service data-source-ref="dataSource"-->
+<!--                users-by-username-query="select userid, userpw, enabled from tbl_member where userid=?"-->
+<!--                authorities-by-username-query="select userid, auth from tbl_member_auth where userid=?"-->
+<!--            ></security:jdbc-user-service>-->
+
+
+
+
+<!--            <security:password-encoder ref="customPasswordEncoder"/>-->
+            <security:password-encoder ref="bcryptPasswordEncoder"/>
+
+<!--            <security:user-service>-->
+<!--                &lt;!&ndash; 스프링 시큐리티 5버전에서는 PasswordEncoder로 포맷팅 처리를 해야함. 패스워드 인코딩 처리 없이 사용하고 싶다면 패스워드 앞에 {noop} 문자열 추가  &ndash;&gt;-->
+<!--                &lt;!&ndash; NOOP (No Operation)은 어셈블리어의 명령, 프로그래밍 언어의 문, 컴퓨터 프로토콜 명령의 하나로, 아무 일도 하지 않는다  &ndash;&gt;-->
+<!--                <security:user name="member" password="{noop}member" authorities = "ROLE_MEMBER"/>-->
+<!--                <security:user name="admin" password="{noop}admin" authorities = "ROLE_MEMBER, ROLE_ADMIN"/>-->
+<!--            </security:user-service>-->
+
+
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <context:component-scan base-package="org.zerock.security"/>
+
+
+
+</beans>

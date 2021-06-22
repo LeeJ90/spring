@@ -1,0 +1,3 @@
+org/zerock/controller/BoardControllerTests.class
+org/zerock/service/BoardServiceTests.class
+org/zerock/mapper/BoardMapperTests.class
